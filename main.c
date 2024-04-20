@@ -1,36 +1,55 @@
-#include <stdio.h>
 #include "connect4.h"
 
-int main(){
-    do {
-        int colorChoise = 0; //choise of turn at the start of the game
-        int turnChoise = 0; //choise of turn at the start of the game
+
+int main() {
+
+    int currentPlayer; // 0 for human, 1 for computer
+    int column;
+    int colorChoise; //choise of turn at the start of the game
+    do
+    {   
+        clearConsole();
+        initializeGrid();
         do { // safety defining of colors, to not get any wrong information
-            printf("Choose your color([1] - Yellow, [2] - Red): ");
+            printf("Choose your color([0] - Yellow, [1] - Red): ");
             scanf("%d", &colorChoise);
-        } while (colorChoise != 1 && colorChoise != 2);
-        if (colorChoise == 1){
-            playerColor = Yellow;
-            computerColor = Red;
-        } 
-        else {
-            playerColor = Red;
-            computerColor = Yellow;
-        } 
+        } while (colorChoise != 1 && colorChoise != 0);
 
         do { // safety defining of starting choise, to not get any wrong information
-            printf("Choose the first player([1] - You, [2] - Computer): ");
-            scanf("%d", &turnChoise);
-        } while (turnChoise != 1 && turnChoise != 2);
-        if(turnChoise == 1) turn = playerColor;
-        else turn = computerColor;
+            printf("Choose the first player([0] - You, [1] - Computer): ");
+            scanf("%d", &currentPlayer);
+        } while (currentPlayer != 1 && currentPlayer != 0);
 
-        initGrid();
-        dropDisk(2);
-        dropDisk(2);
-        showGrid();
-        setTurn();
-        isPlaying = false;
-    } while (isPlaying);
+        do  {
+            displayGrid();
+            if (currentPlayer) {
+                column = recommendColumn();
+                printf("Computer's turn (%s), column %d\n", ((colorChoise) ? "Yellow" : "Red"), column + 1);
+            } 
+            else {
+                printf("Your turn (%s), enter column number (1-7): ", ((colorChoise) ? "Red" : "Yellow"));
+                scanf("%d", &column);
+            }
+
+            if (isMovePossible(column)) {
+
+                dropDisc(column, ((currentPlayer) ?  slots[1-colorChoise] : slots[colorChoise]));
+                currentPlayer = 1 - currentPlayer; // Switch player
+            } else {
+                printf("Invalid move! Try again.\n");
+            }
+        } while (!isGameOver() && !isGridFull());
+
+        displayGrid();
+
+        if (isGameOver()) printf("Game over! %s won!\n", ((currentPlayer) ? "You" : "Computer"));
+        else printf("It's a draw!\n");
+
+        do { // safety checking want to restart, to not get any wrong information
+            printf("Do you want to play again?([0] - No, [1] - Yes): ");
+            scanf("%d", &wantToRestart);
+        } while (wantToRestart != 1 && wantToRestart != 0);
+    } while (wantToRestart);
+
     return 0;
 }
