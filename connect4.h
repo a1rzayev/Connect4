@@ -13,34 +13,34 @@ char slots[] = {YELLOW_DISC, RED_DISC, EMPTY_SLOT};
 bool wantToRestart;
 char grid[ROWS][COLUMNS];
 
-void clearConsole() {
+void clearConsole() { //clears console
     printf("\033[2J\033[1;1H");
 }
 
-void initializeGrid() {
+void initializeGrid() { //initializes grid at the start of game
     for (int i = 0; i < ROWS; ++i) {
-        for (int j = 0; j < COLUMNS; ++j) 
-            grid[i][j] = EMPTY_SLOT;
+        for (int j = 0; j < COLUMNS; ++j) grid[i][j] = EMPTY_SLOT;
     }
 }
 
-void displayGrid() {
+void displayGrid() {  //displays grid after each turn
+    //print top column numbers
     printf("  1 2 3 4 5 6 7\n");
     for (int i = 0; i < ROWS; ++i) {
-        printf("%d ", i + 1); // Print row number
-        for (int j = 0; j < COLUMNS; ++j) printf("%c ", grid[i][j]); // Print grid content
-        printf("%d\n", i + 1); // Print row number
+        printf("%d ", i + 1); //print row number
+        for (int j = 0; j < COLUMNS; ++j) printf("%c ", grid[i][j]); //print grid content
+        printf("%d\n", i + 1); //print row number
     }
-    // Print bottom column numbers
+    //print bottom column numbers
     printf("  1 2 3 4 5 6 7\n\n");
 }
 
 
-bool isMovePossible(int column) {
+bool isMovePossible(int column) { //check if move is possible
     return column >= 1 && column <= COLUMNS && grid[0][column - 1] == EMPTY_SLOT;
 }
 
-void dropDisc(int column, char disc) {
+void dropDisc(int column, char disc) { //drop disk each turn
     int row = ROWS - 1;
     while (grid[row][column - 1] != EMPTY_SLOT) {
         --row;
@@ -48,46 +48,60 @@ void dropDisc(int column, char disc) {
     grid[row][column - 1] = disc;
 }
 
-int countAlignedDisc(int row, int column, char disc) {
+int countAlignedDisc(int row, int column, char disc) { //count aligned disks(for checking victory)
     int count = 0;
 
-    // Check horizontally
+    //check horizontally
     for (int i = column - 3; i <= column + 3; ++i) {
-        if (i >= 0 && i + 3 < COLUMNS && grid[row][i] == disc && grid[row][i + 1] == disc &&
-            grid[row][i + 2] == disc && grid[row][i + 3] == disc) {
+        if (i >= 0 && i + 3 < COLUMNS &&
+            grid[row][i] == disc &&
+            grid[row][i + 1] == disc &&
+            grid[row][i + 2] == disc &&
+            grid[row][i + 3] == disc) {
             ++count;
         }
     }
 
-    // Check vertically
+    //check vertically
     for (int i = row - 3; i <= row + 3; ++i) {
-        if (i >= 0 && i + 3 < ROWS && grid[i][column] == disc && grid[i + 1][column] == disc &&
-            grid[i + 2][column] == disc && grid[i + 3][column] == disc) {
+        if (i >= 0 && i + 3 < ROWS &&
+            grid[i][column] == disc && 
+            grid[i + 1][column] == disc &&
+            grid[i + 2][column] == disc && 
+            grid[i + 3][column] == disc) {
             ++count;
         }
     }
 
-    // Check diagonally (top-left to bottom-right)
+    //check diagonally (top-left to bottom-right)
     for (int i = -3; i <= 3; ++i) {
-        if (row + i >= 0 && row + i + 3 < ROWS && column + i >= 0 && column + i + 3 < COLUMNS &&
-            grid[row + i][column + i] == disc && grid[row + i + 1][column + i + 1] == disc &&
-            grid[row + i + 2][column + i + 2] == disc && grid[row + i + 3][column + i + 3] == disc) {
+        if (row + i >= 0 && row + i + 3 < ROWS &&
+            column + i >= 0 && 
+            column + i + 3 < COLUMNS &&
+            grid[row + i][column + i] == disc &&
+            grid[row + i + 1][column + i + 1] == disc &&
+            grid[row + i + 2][column + i + 2] == disc && 
+            grid[row + i + 3][column + i + 3] == disc) {
             ++count;
         }
     }
 
-    // Check diagonally (top-right to bottom-left)
+    //check diagonally (top-right to bottom-left)
     for (int i = -3; i <= 3; ++i) {
-        if (row - i >= 0 && row - i - 3 < ROWS && column + i >= 0 && column + i + 3 < COLUMNS &&
-            grid[row - i][column + i] == disc && grid[row - i - 1][column + i + 1] == disc &&
-            grid[row - i - 2][column + i + 2] == disc && grid[row - i - 3][column + i + 3] == disc) {
+        if (row - i >= 0 && row - i - 3 < ROWS && 
+            column + i >= 0 && 
+            column + i + 3 < COLUMNS &&
+            grid[row - i][column + i] == disc && 
+            grid[row - i - 1][column + i + 1] == disc &&
+            grid[row - i - 2][column + i + 2] == disc && 
+            grid[row - i - 3][column + i + 3] == disc) {
             ++count;
         }
     }
     return count;
 }
 
-int recommendColumn() {
+int recommendColumn() { //recommends column for bot playing
     srand(time(NULL));
     int column;
     do {
@@ -96,7 +110,7 @@ int recommendColumn() {
     return column;
 }
 
-bool isGameOver() {
+bool isGameOver() { //checks if there is a victory(if draw return false)
     for (int i = 0; i < ROWS; ++i) {
         for (int j = 0; j < COLUMNS; ++j) {
             if (grid[i][j] != EMPTY_SLOT) {
@@ -109,14 +123,13 @@ bool isGameOver() {
     return false;
 }
 
-bool isGridFull() {
+bool isGridFull() { //checks if grid is full
     for (int i = 0; i < COLUMNS; ++i) {
-        if (grid[0][i] == EMPTY_SLOT) 
-            return false;
+        if (grid[0][i] == EMPTY_SLOT) return false;
     }
     return true;
 }
 
-void setTurn(int *turn){
+void setTurn(int *turn){ //sets player after each turn and each game
     *turn = 1 - *turn;
 }
