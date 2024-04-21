@@ -116,3 +116,7 @@ bool isGridFull() {
     }
     return true;
 }
+
+void setTurn(int *turn){
+    *turn = 1 - *turn;
+}
