@@ -1,15 +1,14 @@
 #include "connect4.h"
 
-
 int main() {
 
     int currentPlayer; // 0 for human, 1 for computer
     int column;
     int timePlaying = 1;
-    int startingPlayer;
+    int startingPlayer; // 0 for human, 1 for computer
     int colorChoise; //choise of turn at the start of the game
     do
-    {   
+    {  //each game 
         clearConsole();
         initializeGrid();
         do { // safety defining of colors, to not get any wrong information
@@ -29,11 +28,11 @@ int main() {
             currentPlayer = startingPlayer;
         }
 
-        do  {
+        do  { //each turn
             displayGrid();
             if (currentPlayer) {
                 column = recommendColumn();
-                printf("Computer's turn (%s), column %d\n", ((colorChoise) ? "Yellow" : "Red"), column + 1);
+                printf("Computer's turn (%s), column %d\n", ((colorChoise) ? "Yellow" : "Red"), column);
             } 
             else {
                 printf("Your turn (%s), enter column number (1-7): ", ((colorChoise) ? "Red" : "Yellow"));
@@ -41,7 +40,6 @@ int main() {
             }
 
             if (isMovePossible(column)) {
-
                 dropDisc(column, ((currentPlayer) ?  slots[1-colorChoise] : slots[colorChoise]));
                 setTurn(&currentPlayer);
             } else {
@@ -60,6 +58,7 @@ int main() {
         } while (wantToRestart != 1 && wantToRestart != 0);
         ++timePlaying;
     } while (wantToRestart);
-
+    clearConsole();
+    printf("Thank you for playing!");
     return 0;
 }
