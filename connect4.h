@@ -35,66 +35,62 @@ void displayGrid() {  //displays grid after each turn
     printf("  1 2 3 4 5 6 7\n\n");
 }
 
-
-bool isMovePossible(int column) { //check if move is possible
+bool isMovePossible(int column) { //checks if move is possible
     return column >= 1 && column <= COLUMNS && grid[0][column - 1] == EMPTY_SLOT;
 }
 
-void dropDisc(int column, char disc) { //drop disk each turn
+void dropDisc(int column, char disc) { //drops disk each turn
     int row = ROWS - 1;
     while (grid[row][column - 1] != EMPTY_SLOT) {
         --row;
     }
+    
     grid[row][column - 1] = disc;
 }
 
-int countAlignedDisc(int row, int column, char disc) { //count aligned disks(for checking victory)
+int countAlignedDisc(char wGrid[ROWS][COLUMNS], int row, int column, char disc) { //count aligned disks(for checking victory)
     int count = 0;
-
     //check horizontally
     for (int i = column - 3; i <= column + 3; ++i) {
         if (i >= 0 && i + 3 < COLUMNS &&
-            grid[row][i] == disc &&
-            grid[row][i + 1] == disc &&
-            grid[row][i + 2] == disc &&
-            grid[row][i + 3] == disc) {
+            wGrid[row][i] == disc &&
+            wGrid[row][i + 1] == disc &&
+            wGrid[row][i + 2] == disc &&
+            wGrid[row][i + 3] == disc) {
             ++count;
         }
     }
-
     //check vertically
     for (int i = row - 3; i <= row + 3; ++i) {
         if (i >= 0 && i + 3 < ROWS &&
-            grid[i][column] == disc && 
-            grid[i + 1][column] == disc &&
-            grid[i + 2][column] == disc && 
-            grid[i + 3][column] == disc) {
+            wGrid[i][column] == disc && 
+            wGrid[i + 1][column] == disc &&
+            wGrid[i + 2][column] == disc && 
+            wGrid[i + 3][column] == disc) {
             ++count;
         }
     }
-
     //check diagonally (top-left to bottom-right)
     for (int i = -3; i <= 3; ++i) {
         if (row + i >= 0 && row + i + 3 < ROWS &&
             column + i >= 0 && 
             column + i + 3 < COLUMNS &&
-            grid[row + i][column + i] == disc &&
-            grid[row + i + 1][column + i + 1] == disc &&
-            grid[row + i + 2][column + i + 2] == disc && 
-            grid[row + i + 3][column + i + 3] == disc) {
+            wGrid[row + i][column + i] == disc &&
+            wGrid[row + i + 1][column + i + 1] == disc &&
+            wGrid[row + i + 2][column + i + 2] == disc && 
+            wGrid[row + i + 3][column + i + 3] == disc) {
             ++count;
         }
     }
-
     //check diagonally (top-right to bottom-left)
     for (int i = -3; i <= 3; ++i) {
         if (row - i >= 0 && row - i - 3 < ROWS && 
             column + i >= 0 && 
             column + i + 3 < COLUMNS &&
-            grid[row - i][column + i] == disc && 
-            grid[row - i - 1][column + i + 1] == disc &&
-            grid[row - i - 2][column + i + 2] == disc && 
-            grid[row - i - 3][column + i + 3] == disc) {
+            wGrid[row - i][column + i] == disc && 
+            wGrid[row - i - 1][column + i + 1] == disc &&
+            wGrid[row - i - 2][column + i + 2] == disc && 
+            wGrid[row - i - 3][column + i + 3] == disc) {
             ++count;
         }
     }
@@ -110,13 +106,12 @@ int recommendColumn() { //recommends column for bot playing
     return column;
 }
 
-bool isGameOver() { //checks if there is a victory(if draw return false)
+bool isGameOver(char wGrid[ROWS][COLUMNS]) { //checks if there is a victory(if draw return false)
     for (int i = 0; i < ROWS; ++i) {
         for (int j = 0; j < COLUMNS; ++j) {
-            if (grid[i][j] != EMPTY_SLOT) {
-                char disc = grid[i][j];
-                if (countAlignedDisc(i, j, disc) > 0) 
-                    return true;
+            if (wGrid[i][j] != EMPTY_SLOT) {
+                char disc = wGrid[i][j];
+                if (countAlignedDisc(wGrid, i, j, disc) > 0) return true;
             }
         }
     }
@@ -132,4 +127,23 @@ bool isGridFull() { //checks if grid is full
 
 void setTurn(int *turn){ //sets player after each turn and each game
     *turn = 1 - *turn;
+}
+
+int winningMove(char playerSign) { //send the player winning move
+    int row;
+    char testGrid[ROWS][COLUMNS];
+    for (int i = 0; i < ROWS; ++i) {
+        for(int j = 0; j < COLUMNS; ++j) testGrid[i][j] = grid[i][j];
+    }
+    for (int i = 0; i < COLUMNS; ++i)
+    {
+        row = ROWS - 1;
+        while (testGrid[row][i] != EMPTY_SLOT) {
+            --row;
+        }
+        testGrid[row][i] = playerSign;
+        if(isGameOver(testGrid)) return (i + 1);
+        testGrid[row][i] = EMPTY_SLOT;
+    }
+    return 0;
 }
