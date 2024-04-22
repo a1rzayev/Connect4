@@ -1,7 +1,6 @@
 #include "connect4.h"
 
 int main() {
-
     int currentPlayer; // 0 for human, 1 for computer
     int column;
     int timePlaying = 1;
@@ -31,11 +30,14 @@ int main() {
         do  { //each turn
             displayGrid();
             if (currentPlayer) {
-                column = recommendColumn();
+                if(winningMove(slots[1 - colorChoise])) column = winningMove(slots[1 - colorChoise]);
+                else column = recommendColumn();
                 printf("Computer's turn (%s), column %d\n", ((colorChoise) ? "Yellow" : "Red"), column);
             } 
             else {
-                printf("Your turn (%s), enter column number (1-7): ", ((colorChoise) ? "Red" : "Yellow"));
+                printf("Your turn (%s)\n", ((colorChoise) ? "Red" : "Yellow"));
+                if(winningMove(slots[colorChoise])) printf("(Note: you should play column %d)\n", winningMove(slots[colorChoise]));
+                printf("Enter column number (1-7): ");
                 scanf("%d", &column);
             }
 
@@ -45,11 +47,10 @@ int main() {
             } else {
                 printf("Invalid move! Try again.\n");
             }
-        } while (!isGameOver() && !isGridFull());
-
+        } while (!isGameOver(grid) && !isGridFull());
         displayGrid();
 
-        if (isGameOver()) printf("Game over! %s won!\n", ((currentPlayer) ? "You" : "Computer"));
+        if (isGameOver(grid)) printf("Game over! %s won!\n", ((currentPlayer) ? "You" : "Computer"));
         else printf("It's a draw!\n");
 
         do { // safety checking want to restart, to not get any wrong information
